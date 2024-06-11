@@ -1,0 +1,48 @@
+.root
+{
+}
+
+#vboxMain
+{
+    -fx-background-image: url("wallpaper.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
+@font-face {
+    font-family: Newrocker;
+    src: url('/fonts/Newrocker-Gy5a.ttf');
+}
+
+.button
+{
+    -fx-font-family: Newrocker;
+    -fx-text-fill: #e89500;
+    -fx-focus-color: transparent;
+    -fx-background-color: #3b3727;
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
+    -fx-border-color: #3b3727;
+    -fx-border-radius: 3px;
+    -fx-border-width: 4px;
+}
+
+.button:hover
+{
+    -fx-border-color: #381919;
+    -fx-border-radius: 3px;
+    -fx-border-width: 4px;
+    -fx-background-color: #2c1a1a;
+}
+
+.button:focused, .button:pressed, .button:selected, .button:hover{
+    -fx-font-size: 21px;
+}
+
+#mainText
+{
+    -fx-font-family: Newrocker;
+}
+
+
+

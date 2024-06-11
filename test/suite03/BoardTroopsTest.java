@@ -27,8 +27,10 @@ public class BoardTroopsTest {
     public void placingTroops() {
         Board board = new Board(3);
         PositionFactory pf = board.positionFactory();
+        StandardDrakeSetup setup = new StandardDrakeSetup();
 
-        // There are no troops at the beginning, no leader, no guards
+        // Jednotky na desce začínají prázdné, žádný vůdce,
+        // žádné stráže
         BoardTroops troops1 = new BoardTroops(PlayingSide.BLUE);
 
         assertSame(PlayingSide.BLUE, troops1.playingSide());
@@ -39,8 +41,8 @@ public class BoardTroopsTest {
 
         checkEmpty(board, troops1);
 
-        // First we must place the leader
-        Troop drake = new Troop("Drake");
+        // Nejdříve postavíme vůdce
+        Troop drake = setup.DRAKE;
         BoardTroops troops2 = troops1.placeTroop(drake, pf.pos("a2"));
         assertNotSame(troops1, troops2);
         checkEmpty(board, troops1);
@@ -64,8 +66,8 @@ public class BoardTroopsTest {
         assertSame(troops2.playingSide(), troops2.at(pf.pos("a2")).get().side());
         assertEquals(pf.pos("a2"), troops2.leaderPosition());
 
-        // First guard
-        Troop clubman1 = new Troop("Clubman");
+        // První stráž
+        Troop clubman1 = setup.CLUBMAN;
         BoardTroops troops3 = troops2.placeTroop(clubman1, pf.pos("a1"));
         assertSame(1, troops3.guards());
         assertSame(true, troops3.isLeaderPlaced());
@@ -89,8 +91,8 @@ public class BoardTroopsTest {
         assertEquals(Optional.empty(), troops3.at(pf.pos("c2")));
         assertEquals(Optional.empty(), troops3.at(pf.pos("c3")));
 
-        // Second guard
-        Troop clubman2 = new Troop("Clubman");
+        // Druhá stráž
+        Troop clubman2 = setup.CLUBMAN;
         BoardTroops troops4 = troops3.placeTroop(clubman2, pf.pos("b2"));
         assertSame(2, troops4.guards());
         assertSame(true, troops4.isLeaderPlaced());
@@ -115,8 +117,8 @@ public class BoardTroopsTest {
         assertEquals(Optional.empty(), troops4.at(pf.pos("c2")));
         assertEquals(Optional.empty(), troops4.at(pf.pos("c3")));
 
-        // Another unit (4th including leader and guard)
-        Troop spearman = new Troop("Spearman");
+        // Nějaká další jednotka
+        Troop spearman = setup.SPEARMAN;
         BoardTroops troops5 = troops4.placeTroop(spearman, pf.pos("c1"));
         assertSame(2, troops5.guards());
         assertSame(true, troops5.isLeaderPlaced());
@@ -151,16 +153,17 @@ public class BoardTroopsTest {
         BoardTroops troops = new BoardTroops(PlayingSide.ORANGE);
         assertSame(PlayingSide.ORANGE, troops.playingSide());
 
-        Troop drake = new Troop("Clubman");
-        Troop clubman1 = new Troop("Clubman");
-        Troop clubman2 = new Troop("Clubman");
-        Troop spearman = new Troop("Spearman");
+        StandardDrakeSetup setup = new StandardDrakeSetup();
+        Troop drake = setup.DRAKE;
+        Troop clubman1 = setup.CLUBMAN;
+        Troop clubman2 = setup.CLUBMAN;
+        Troop spearman = setup.SPEARMAN;
 
         try {
             troops.troopStep(pf.pos("a2"), pf.pos("a3"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(drake, pf.pos("a2"));
@@ -169,7 +172,7 @@ public class BoardTroopsTest {
             troops.troopStep(pf.pos("a2"), pf.pos("a3"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(clubman1, pf.pos("a1"));
@@ -178,7 +181,7 @@ public class BoardTroopsTest {
             troops.troopStep(pf.pos("a2"), pf.pos("a3"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
 
@@ -186,7 +189,7 @@ public class BoardTroopsTest {
                 .placeTroop(clubman2, pf.pos("b2"))
                 .placeTroop(spearman, pf.pos("c1"));
 
-        // Test initial unit placement
+        //Test výchozího umístění jednotek
         assertSame(clubman1, troops.at(pf.pos("a1")).get().troop());
         assertSame(drake, troops.at(pf.pos("a2")).get().troop());
         assertEquals(Optional.empty(), troops.at(pf.pos("a3")));
@@ -197,16 +200,16 @@ public class BoardTroopsTest {
         assertEquals(Optional.empty(), troops.at(pf.pos("c2")));
         assertEquals(Optional.empty(), troops.at(pf.pos("c3")));
 
-        // Test faces (side of each unit game piece)
+        //Test výchozích stran (face) jednotek
         assertEquals(TroopFace.AVERS, troops.at(pf.pos("a1")).get().face());
         assertEquals(TroopFace.AVERS, troops.at(pf.pos("a2")).get().face());
         assertEquals(TroopFace.AVERS, troops.at(pf.pos("b2")).get().face());
         assertEquals(TroopFace.AVERS, troops.at(pf.pos("c1")).get().face());
 
-        // Move drake (leader) from a2 to a3
+        //Pohyb drake z a2 na a3
         troops = troops.troopStep(pf.pos("a2"), pf.pos("a3"));
 
-        // Test placement of units after the move of unit from a2 to a3
+        //Test umístění jednotek po pohybu jednotky z a2 na a3
         assertSame(clubman1, troops.at(pf.pos("a1")).get().troop());
         assertEquals(Optional.empty(), troops.at(pf.pos("a2")));
         assertSame(drake, troops.at(pf.pos("a3")).get().troop());
@@ -218,29 +221,29 @@ public class BoardTroopsTest {
         assertEquals(Optional.empty(), troops.at(pf.pos("c2")));
         assertEquals(Optional.empty(), troops.at(pf.pos("c3")));
 
-        // Test that the moved unit has flipped (switched its face)
+        //Test zda jednotka po pohybu změnila stranu (face)
         assertEquals(TroopFace.REVERS, troops.at(pf.pos("a3")).get().face());
 
-        // Leader position should also report the new position
+        // Pozor na pozici vůdce
         assertEquals(pf.pos("a3"), troops.leaderPosition());
 
         try {
             troops.troopStep(pf.pos("a2"), pf.pos("c2"));
             fail();
         } catch (IllegalArgumentException e) {
-            // It is not possible to move from an empty space
+            // Není možné se pohnout z prázného políčka
         }
 
         try {
             troops.troopStep(pf.pos("c1"), pf.pos("a3"));
             fail();
         } catch (IllegalArgumentException e) {
-            // It is not possible to move to a space occupied by a unit
+            // Není možné se pohnout na políčko s jednotkou
         }
 
-        // Move drake from a3 to b3
+        //Pohyb drake z a3 na b3
         troops = troops.troopStep(pf.pos("a3"), pf.pos("b3"));
-        // Test that the moved unit has flipped (switched its face)
+        //Test zda jednotka po pohybu znovu změnila stranu (face)
         assertEquals(TroopFace.AVERS, troops.at(pf.pos("b3")).get().face());
     }
 
@@ -252,15 +255,16 @@ public class BoardTroopsTest {
         BoardTroops troops = new BoardTroops(PlayingSide.ORANGE);
         assertSame(PlayingSide.ORANGE, troops.playingSide());
 
-        Troop drake = new Troop("Clubman");
-        Troop clubman1 = new Troop("Clubman");
-        Troop clubman2 = new Troop("Clubman");
+        StandardDrakeSetup setup = new StandardDrakeSetup();
+        Troop drake = setup.DRAKE;
+        Troop clubman1 = setup.CLUBMAN;
+        Troop clubman2 = setup.CLUBMAN;
 
         try {
             troops.troopFlip(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(drake, pf.pos("a2"));
@@ -269,7 +273,7 @@ public class BoardTroopsTest {
             troops.troopFlip(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(clubman1, pf.pos("a1"));
@@ -278,7 +282,7 @@ public class BoardTroopsTest {
             troops.troopFlip(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
 
@@ -293,7 +297,7 @@ public class BoardTroopsTest {
             troops.troopFlip(pf.pos("a3"));
             fail();
         } catch (IllegalArgumentException e) {
-            // It is not possible to flip a troop on an empty space (there is no troop to flip)
+            // Není možné otočit jednotku na prázdném políčku
         }
     }
 
@@ -305,15 +309,16 @@ public class BoardTroopsTest {
         BoardTroops troops = new BoardTroops(PlayingSide.ORANGE);
         assertSame(PlayingSide.ORANGE, troops.playingSide());
 
-        Troop drake = new Troop("Clubman");
-        Troop clubman1 = new Troop("Clubman");
-        Troop clubman2 = new Troop("Clubman");
+        StandardDrakeSetup setup = new StandardDrakeSetup();
+        Troop drake = setup.DRAKE;
+        Troop clubman1 = setup.CLUBMAN;
+        Troop clubman2 = setup.CLUBMAN;
 
         try {
             troops.removeTroop(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(drake, pf.pos("a2"));
@@ -322,7 +327,7 @@ public class BoardTroopsTest {
             troops.removeTroop(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
         troops = troops.placeTroop(clubman1, pf.pos("a1"));
@@ -331,7 +336,7 @@ public class BoardTroopsTest {
             troops.removeTroop(pf.pos("a2"));
             fail();
         } catch (IllegalStateException e) {
-            // It is not possible to move units until leader and both guards are placed
+            // Dokud nestojí vůdce a stráže, není možné hýbat s jednotkami.
         }
 
 
@@ -341,7 +346,7 @@ public class BoardTroopsTest {
             troops.removeTroop(pf.pos("a3"));
             fail();
         } catch (IllegalArgumentException e) {
-            // It is not possible to remove a unit from an empty space (there is no troop to remove)
+            // Není možné odstranit jednotku na prázdném políčku
         }
 
         troops = troops.removeTroop(pf.pos("a2"));
